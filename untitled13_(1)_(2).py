@@ -288,7 +288,7 @@ text_stemming_all = ' '.join(
 wordcloud = WordCloud(
     width=1200, height=600,
     background_color='white',
-    colormap='inferno',
+    colormap='Blues',
     max_words=150,
     min_font_size=10,
     collocations=False
@@ -377,9 +377,9 @@ print("✅ Data berlabel tersimpan!")
 import matplotlib.colors as mcolors
 from matplotlib import cm
 
-# Ambil warna dari colormap inferno
-import matplotlib; inferno = matplotlib.colormaps.get_cmap('inferno')
-colors = [inferno(0.2), inferno(0.6), inferno(0.85)]
+# Warna: negatif=merah, positif=hijau, netral=abu
+color_map = {'negatif': '#e05c5c', 'positif': '#4caf7d', 'netral': '#9e9e9e'}
+colors = [color_map.get(label, '#90caf9') for label in counts.index]
 
 counts = df_model['sentiment'].value_counts()
 
@@ -401,6 +401,9 @@ axes[1].pie(counts.values, labels=counts.index, colors=colors,
             wedgeprops={'edgecolor':'white','linewidth':1.5})
 axes[1].set_title('Proporsi Sentimen (%)')
 
+counts = df_model['sentiment'].value_counts()
+colors = [color_map.get(label, '#90caf9') for label in counts.index]
+
 plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.savefig('distribusi_sentimen.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -412,7 +415,8 @@ print(f"Netral : {counts.get('netral',  0)} ({counts.get('netral', 0)/counts.sum
 
 """#15. WordCloud per Sentimen"""
 
-fig_labels = {'positif': ('3a', 'Greens'), 'negatif': ('3b', 'Reds'), 'netral': ('3c', 'Blues')}
+colormap_map = {'positif': 'Greens', 'negatif': 'Reds', 'netral': 'Blues'}
+fig_labels   = {'positif': '3a',     'negatif': '3b',   'netral': '3c'}
 
 for label in ['positif', 'negatif', 'netral']:
     subset = df_model[df_model['sentiment'] == label]['clean']
@@ -424,13 +428,13 @@ for label in ['positif', 'negatif', 'netral']:
     wc = WordCloud(
         width=1200, height=600,
         background_color='white',
-        colormap='inferno',
+        colormap=colormap_map[label],
         max_words=150,
         min_font_size=10,
         collocations=False
     ).generate(teks_gabung)
 
-    fig_num = fig_labels[label][0]
+    fig_num = fig_labels[label]
     plt.figure(figsize=(14, 6))
     plt.imshow(wc, interpolation='bilinear')
     plt.axis('off')
@@ -458,13 +462,13 @@ def plot_ngram(corpus, n, label, top_k=5):
     words, counts = zip(*words_freq)
     gram = 'Unigram' if n==1 else 'Bigram'
 
-    import matplotlib; inferno = matplotlib.colormaps.get_cmap('inferno')
-    palette = [inferno(0.85 - i*0.1) for i in range(top_k)]
+    # Warna: positif=hijau, negatif=merah
+    bar_color = '#4caf7d' if label == 'positif' else '#e05c5c'
 
     fig, ax = plt.subplots(figsize=(9,4))
     bars = ax.barh(list(reversed(list(words))),
                    list(reversed(list(counts))),
-                   color=list(reversed(palette)), edgecolor='white', linewidth=0.5)
+                   color=bar_color, edgecolor='white', linewidth=0.5)
     for bar, count in zip(bars, reversed(list(counts))):
         ax.text(bar.get_width()+0.5, bar.get_y()+bar.get_height()/2,
                 str(count), va='center', fontsize=10, fontweight='bold')
@@ -571,7 +575,7 @@ model_bi, pred_bi = train_evaluate(
 fig, axes = plt.subplots(1, 2, figsize=(12,4))
 for ax, pred, title in zip(axes, [pred_uni, pred_bi], ['Unigram TF-IDF','Bigram TF-IDF']):
     cm_val = confusion_matrix(y_test, pred, labels=['positif','negatif'])
-    sns.heatmap(cm_val, annot=True, fmt='d', ax=ax, cmap='inferno',
+    sns.heatmap(cm_val, annot=True, fmt='d', ax=ax, cmap='Blues',
                 xticklabels=['positif','negatif'],
                 yticklabels=['positif','negatif'],
                 linewidths=0.5)
