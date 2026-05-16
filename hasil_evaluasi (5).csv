@@ -1,3 +1,0 @@
-Model,Accuracy,Precision,Recall,F1-Score
-SGD + Unigram TF-IDF,0.8498,0.849,0.8498,0.8473
-SGD + Bigram TF-IDF,0.8498,0.8496,0.8498,0.8467
