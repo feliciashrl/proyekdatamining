@@ -401,7 +401,7 @@ axes[1].pie(counts.values, labels=counts.index, colors=colors,
             wedgeprops={'edgecolor':'white','linewidth':1.5})
 axes[1].set_title('Proporsi Sentimen (%)')
 
-plt.tight_layout()
+plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.savefig('distribusi_sentimen.png', dpi=150, bbox_inches='tight')
 plt.show()
 
@@ -441,7 +441,6 @@ for label in ['positif', 'negatif', 'netral']:
     plt.show()
 
     # Ringkasan kata teratas
-    from collections import Counter
     top5 = Counter(teks_gabung.split()).most_common(5)
     top5_str = ', '.join([f'{w} ({c}x)' for w,c in top5])
     print(f"Gambar {fig_num}. Word Cloud Sentimen {label.capitalize()} — Ulasan Halodoc (n={len(subset)})")
